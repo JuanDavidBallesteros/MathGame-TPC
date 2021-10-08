@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import ui.controller.ConnectionController;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -20,6 +21,7 @@ public class ConnectionView extends Stage {
 
     private Button closeBtn;
     private Button playBtn;
+    private Button localBtn;
 
     private Scene scene;
     
@@ -37,14 +39,13 @@ public class ConnectionView extends Stage {
 
             closeBtn = (Button) loader.getNamespace().get("closeBtn");
             playBtn = (Button) loader.getNamespace().get("playBtn");
+            localBtn = (Button) loader.getNamespace().get("localBtn");
             
             scene = new Scene(parent);
             this.setScene(scene);
             controller = new ConnectionController(this);
 
-
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -68,6 +69,11 @@ public class ConnectionView extends Stage {
 
     public Button getPlayBtn() {
         return playBtn;
+    }
+
+
+    public Button getLocalBtn() {
+        return localBtn;
     }
     
 }

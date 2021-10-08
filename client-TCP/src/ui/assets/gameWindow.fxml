@@ -42,7 +42,7 @@
                      </font>
                   </Label>
                   <Button fx:id="validateBtn" layoutX="119.0" layoutY="147.0" mnemonicParsing="false" styleClass="button-accept" text="Validate" />
-                  <TextField fx:id="asnwereTF" alignment="CENTER" layoutX="68.0" layoutY="90.0" promptText="Answer" />
+                  <TextField fx:id="answerTF" alignment="CENTER" layoutX="68.0" layoutY="90.0" promptText="Answer" />
                   <Separator layoutX="54.0" layoutY="-1.0" opacity="0.44" prefWidth="201.0" AnchorPane.leftAnchor="52.0" AnchorPane.rightAnchor="52.0" />
                </children>
             </AnchorPane>
@@ -76,7 +76,7 @@
                   <Insets left="20.0" />
                </GridPane.margin>
             </Label>
-            <Label fx:id="ouwnStatus" text="Status" textFill="#c9c9c9" GridPane.rowIndex="1">
+            <Label fx:id="ownStatus" text="Status" textFill="#c9c9c9" GridPane.rowIndex="1">
                <padding>
                   <Insets left="20.0" />
                </padding>

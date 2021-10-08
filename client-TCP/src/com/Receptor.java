@@ -3,28 +3,25 @@ package com;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public class Receptor extends Thread{
+public class Receptor extends Thread {
 	
-	private BufferedReader bReader;
+	private BufferedReader breader;
 	private OnMessageListener listener;
 	
-	//Referencia
-	private Session session;
 	
-	public Receptor(Session session, BufferedReader bReader) {
-		this.session = session;
-		this.bReader = bReader;
+	public Receptor(BufferedReader breader) {
+		this.breader = breader;
 	}
 	
 	@Override
 	public void run() {
 		try {
 			while(true) {	
-				String msg = bReader.readLine();
+				String msg = breader.readLine();
 				if(msg == null){
 					break;
 				}
-				listener.onMessage(session, msg);
+				listener.onMessage(msg);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -38,7 +35,7 @@ public class Receptor extends Thread{
 	
 	
 	public interface OnMessageListener{
-		void onMessage(Session session, String msg);
+		void onMessage(String msg);
 	}
 
 }
