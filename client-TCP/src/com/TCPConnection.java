@@ -57,7 +57,11 @@ public class TCPConnection extends Thread {
 	}
 
 	public Emisor getEmisor() {
-		return this.emisor;
+		return emisor;
+	}
+
+	public Receptor getReceptor() {
+		return receptor;
 	}
 
 	public void setConnectionListener(OnConnectionListener connectionListener) {

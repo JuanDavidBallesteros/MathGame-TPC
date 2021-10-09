@@ -2,6 +2,7 @@ package ui.view;
 
 import java.io.IOException;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -68,5 +69,15 @@ public class GameView extends Stage {
     public TextField getAnswerTF() {
         return answerTF;
     }
-    
+
+    public void setLabelText(Label label, String text) {
+        Platform.runLater(() -> {
+            label.setText(text);
+        });
+    }
+
+    public void buttonDisable(Button btn, boolean isOff){
+        btn.setDisable(isOff);
+    }
+
 }

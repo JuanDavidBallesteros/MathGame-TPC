@@ -21,6 +21,7 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 		sessions = new ArrayList<>();
 		gson = new Gson();
 		sessionQueue = new LinkedList<>();
+		game = new Game();
 
 	}
 
@@ -99,9 +100,14 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 				break;
 			case "Game":
 				Game gameIn = gson.fromJson(msg, Game.class);
-				Session one = findSession(gameIn.getUsers()[0]);
-				Session two = findSession(gameIn.getUsers()[1]);
-				sendDirectTwo(one, two, msg);
+				if (gameIn.isFull()) {
+					Session one = findSession(gameIn.getUsers()[0]);
+					Session two = findSession(gameIn.getUsers()[1]);
+					sendDirectTwo(one, two, msg);
+				} else {
+					Session one = findSession(gameIn.getUsers()[0]);
+					sendDirectOne(one, msg);
+				}
 				break;
 
 		}
@@ -110,15 +116,15 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 	private void matchPlayers() {
 		while (!sessionQueue.isEmpty()) {
 			if (game.getUsers()[0] == null) {
-				sessionQueue.peek().getUser().setGame(game);
 				game.getUsers()[0] = sessionQueue.peek().getUser();
+				sessionQueue.peek().getUser().setGame(game);
 
 				String msg = gson.toJson(game);
 				sendDirectOne(sessionQueue.poll(), msg);
 
 			} else if (game.getUsers()[1] == null) {
-				sessionQueue.peek().getUser().setGame(game);
 				game.getUsers()[1] = sessionQueue.peek().getUser();
+				sessionQueue.peek().getUser().setGame(game);
 
 				String msg = gson.toJson(game);
 				sendDirectTwo(findSession(game.getUsers()[0]), sessionQueue.poll(), msg);
@@ -137,6 +143,7 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 		for (int i = 0; i < sessions.size() && !validation; i++) {
 			if (sessions.get(i).getUser().getId().equals(user.getId())) {
 				temp = sessions.get(i);
+				validation = true;
 			}
 		}
 
