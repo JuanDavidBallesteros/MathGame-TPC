@@ -1,5 +1,7 @@
 package ui.controller;
 
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.UUID;
 
 import com.Receptor;
@@ -28,20 +30,35 @@ public class GameController implements Receptor.OnMessageListener {
 
     }
 
-    private void sendUser() {
-        String id = UUID.randomUUID().toString();
-        user = new User(id);
-        String json = gson.toJson(user);
-        tcp.getEmisor().sendMessage(json);
+    @Override
+    public void onMessage(String msg) {
+        // System.out.println(msg);
+        Game game = gson.fromJson(msg, Game.class);
+
+        if (game.isFull()) {
+            opponent = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[1] : game.getUsers()[0];
+            user = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[0] : game.getUsers()[1];
+            user.setGame(game);
+            giveProblems(game);
+
+            if (user.isFinish() && game.getWinner() == null && !opponent.isFinish()) {
+                gameWindowInWaiting();
+            } else if (game.getWinner() == null && !user.isFinish()) {
+                gameWindowInGame();
+            } else {
+                gameWindowWinner(game);
+            }
+        } else {
+            gameWindowNoFull();
+        }
     }
 
     private void btnActions() {
         view.getValidateBtn().setOnAction(e -> {
             if (validateAnswer()) {
                 user.getProblems().poll();
-                user.setNumProblem(user.getNumProblem() + 1);
-
-                if (user.getProblems().size() <= 0) {
+                    user.setNumProblem(user.getNumProblem() + 1);
+                if (user.getProblems().isEmpty()) {
                     user.setFinish(true);
                 }
                 Game game = user.getGame();
@@ -65,32 +82,10 @@ public class GameController implements Receptor.OnMessageListener {
         }
     }
 
-    @Override
-    public void onMessage(String msg) {
-        // System.out.println(msg);
-        Game game = gson.fromJson(msg, Game.class);
-
-        if (game.isFull()) {
-            opponent = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[1] : game.getUsers()[0];
-            user = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[0] : game.getUsers()[1];
-            user.setGame(game);
-            giveProblems(game);
-
-            if (user.isFinish() && game.getWinner() == null) {
-                gameWindowInWaiting();
-            } else if (game.getWinner() == null && !user.isFinish()) {
-                gameWindowInGame();
-            } else {
-                gameWindowWinner(game);
-            }
-        } else {
-            gameWindowNoFull();
-        }
-    }
-
     private void giveProblems(Game game) {
         if (user.getProblems().size() == 0 && !user.isFinish()) {
-            user.setProblems(game.getProblems());
+            Queue<Problem> temp = new LinkedList<>(game.getProblems());
+            user.setProblems(temp);
         }
     }
 
@@ -143,6 +138,12 @@ public class GameController implements Receptor.OnMessageListener {
                 e.printStackTrace();
             }
         }).start();
+    }
 
+    private void sendUser() {
+        String id = UUID.randomUUID().toString();
+        user = new User(id);
+        String json = gson.toJson(user);
+        tcp.getEmisor().sendMessage(json);
     }
 }

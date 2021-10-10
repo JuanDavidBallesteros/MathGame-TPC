@@ -34,6 +34,10 @@ public class Game {
         return winner;
     }
 
+    public void setWinner(User winner) {
+        this.winner = winner;
+    }
+
     public boolean isFull() {
         if(users[0] != null && users[1] != null){
             return true;

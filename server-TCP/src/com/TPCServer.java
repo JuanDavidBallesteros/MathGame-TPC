@@ -103,6 +103,10 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 				if (gameIn.isFull()) {
 					Session one = findSession(gameIn.getUsers()[0]);
 					Session two = findSession(gameIn.getUsers()[1]);
+					if (gameIn.getUsers()[0].isFinish() && gameIn.getUsers()[1].isFinish()) {
+						gameIn.setWinner(gameIn.getUsers()[0]);
+						msg = gson.toJson(gameIn);
+					}
 					sendDirectTwo(one, two, msg);
 				} else {
 					Session one = findSession(gameIn.getUsers()[0]);
@@ -125,7 +129,7 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 			} else if (game.getUsers()[1] == null) {
 				game.getUsers()[1] = sessionQueue.peek().getUser();
 				sessionQueue.peek().getUser().setGame(game);
-				
+
 				String msg = gson.toJson(game);
 				sendDirectTwo(findSession(game.getUsers()[0]), sessionQueue.poll(), msg);
 			}
