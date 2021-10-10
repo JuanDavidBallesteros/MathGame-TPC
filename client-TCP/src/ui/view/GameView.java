@@ -80,4 +80,10 @@ public class GameView extends Stage {
         btn.setDisable(isOff);
     }
 
+    public void cleanAnswer() {
+        Platform.runLater(() -> {
+            answerTF.setText("");
+        });
+    }
+
 }

@@ -8,6 +8,9 @@ import com.Receptor;
 import com.TCPConnection;
 import com.google.gson.Gson;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import ui.view.GameView;
 import model.*;
 
@@ -55,34 +58,41 @@ public class GameController implements Receptor.OnMessageListener {
 
     private void btnActions() {
         view.getValidateBtn().setOnAction(e -> {
+            
+            view.cleanAnswer();
+
             if (validateAnswer()) {
-                user.getProblems().poll(); 
+                user.getProblems().poll();
                 if (user.getProblems().isEmpty()) {
                     user.setFinish(true);
                     user.getTime().stopTime();
                 } else {
                     user.setNumProblem(user.getNumProblem() + 1);
                 }
-                
                 Game game = user.getGame();
                 String json = gson.toJson(game);
                 tcp.getEmisor().sendMessage(json);
 
             } else {
-                // Alerta valor invalido cierre automatico
-                System.out.println("Revisa tu respuesta");
+                alert(AlertType.WARNING, "Incorrect Answer", "Please try again");
             }
         });
     }
 
     private boolean validateAnswer() {
-        int answer = Integer.parseInt(view.getAnswerTF().getText());
-        int result = user.getProblems().peek().getResult();
-        if (answer == result) {
-            return true;
-        } else {
+        try {
+            int answer = Integer.parseInt(view.getAnswerTF().getText());
+            int result = user.getProblems().peek().getResult();
+            if (answer == result) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            alert(AlertType.ERROR, "Number Format Exception", "Pleas write a number");
             return false;
         }
+
     }
 
     private void giveProblems(Game game) {
@@ -149,5 +159,25 @@ public class GameController implements Receptor.OnMessageListener {
         user = new User(id);
         String json = gson.toJson(user);
         tcp.getEmisor().sendMessage(json);
+    }
+
+    private void alert(AlertType type, String title, String msg) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+
+        alert.show();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+                Platform.runLater(() -> {
+                    alert.close();
+                });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }

@@ -30,26 +30,35 @@ public class ConnectionController implements TCPConnection.OnConnectionListener 
         });
 
         view.getPlayBtn().setOnAction(e -> {
-            String ip = view.getIpTF().getText();
-            String puerto = view.getPortTF().getText();
-            int puertoInt = Integer.parseInt(puerto);
-            tcp.setIp(ip);
-            tcp.setPuerto(puertoInt);
-            tcp.start();
+            try {
+                String ip = view.getIpTF().getText();
+                String puerto = view.getPortTF().getText();
+                int puertoInt = Integer.parseInt(puerto);
+                tcp.setIp(ip);
+                tcp.setPuerto(puertoInt);
+                tcp.start();
+            } catch (NumberFormatException num) {
+                view.warmingLabelVisible();
+                view.setLabelText(view.getWarmingLabel(), view.getWarmingLabel().getText() + " Error in port number");
+            }
         });
     }
 
     @Override
-    public void onConnection() {
-        Platform.runLater(
-                () -> {
-                    GameView gameView = new GameView();
-                    view.close();
-                    gameView.show();
-                }
-
-        );
-        
+    public void onConnection(boolean connected) {
+        if (connected) {
+            Platform.runLater(() -> {
+                GameView gameView = new GameView();
+                view.close();
+                gameView.show();
+            });
+        } else {
+            if(view.getWarmingLabel().isVisible()){
+                view.setLabelText(view.getWarmingLabel(), view.getWarmingLabel().getText() + " Error to connect");
+            } else {
+                view.warmingLabelVisible();
+            } 
+        }
     }
 
 }

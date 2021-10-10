@@ -23,3 +23,7 @@
 .back {
     -fx-background-color : rgb(17, 25, 49);
 }
+.text-field{
+    -fx-font-color: rgb(255, 255, 255);
+    -fx-background-color : rgb(37, 47, 77);
+}

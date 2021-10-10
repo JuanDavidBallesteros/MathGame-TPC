@@ -44,7 +44,7 @@ public class TCPConnection extends Thread {
 			System.out.println("Conectado al servidor");
 			socket = new Socket(ip, puerto);
 			System.out.println("Conectado");
-			connectionListener.onConnection();
+			connectionListener.onConnection(true);
 
 			receptor = new Receptor(new BufferedReader(new InputStreamReader(socket.getInputStream())));
 			receptor.start();
@@ -52,6 +52,7 @@ public class TCPConnection extends Thread {
 			emisor = new Emisor(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())));
 
 		} catch (IOException e) {
+			connectionListener.onConnection(false);
 			e.printStackTrace();
 		}
 	}
@@ -69,7 +70,7 @@ public class TCPConnection extends Thread {
 	}
 
 	public interface OnConnectionListener {
-		public void onConnection();
+		public void onConnection( boolean connected);
 	}
 
 }

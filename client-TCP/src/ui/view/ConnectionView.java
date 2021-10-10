@@ -2,13 +2,13 @@ package ui.view;
 
 import java.io.IOException;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import ui.controller.ConnectionController;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBase;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -26,8 +26,8 @@ public class ConnectionView extends Stage {
     private Scene scene;
     
     private ConnectionController controller;
+    
     // Constructor
-
     public ConnectionView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../assets/connectionWindow.fxml"));
@@ -36,6 +36,7 @@ public class ConnectionView extends Stage {
             ipTF = (TextField) loader.getNamespace().get("ipTF");
             portTF = (TextField) loader.getNamespace().get("portTF");
             warmingLabel = (Label) loader.getNamespace().get("warmingLabel");
+            warmingLabel.setVisible(false);
 
             closeBtn = (Button) loader.getNamespace().get("closeBtn");
             playBtn = (Button) loader.getNamespace().get("playBtn");
@@ -50,6 +51,17 @@ public class ConnectionView extends Stage {
         }
     }
 
+    public void setLabelText(Label label, String text) {
+        Platform.runLater(() -> {
+            label.setText(text);
+        });
+    }
+
+    public void warmingLabelVisible(){
+        Platform.runLater(()->{
+            warmingLabel.setVisible(!warmingLabel.isVisible());
+        });
+    }
 
     public TextField getIpTF() {
         return ipTF;
