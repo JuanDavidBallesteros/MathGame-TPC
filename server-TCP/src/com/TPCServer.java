@@ -9,6 +9,7 @@ import java.util.Queue;
 
 import com.google.gson.Gson;
 
+import exception.TimeException;
 import model.*;
 
 public class TPCServer extends Thread implements Receptor.OnMessageListener {
@@ -104,8 +105,21 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 					Session one = findSession(gameIn.getUsers()[0]);
 					Session two = findSession(gameIn.getUsers()[1]);
 					if (gameIn.getUsers()[0].isFinish() && gameIn.getUsers()[1].isFinish()) {
-						gameIn.setWinner(gameIn.getUsers()[0]);
-						msg = gson.toJson(gameIn);
+						try {
+							if (gameIn.getUsers()[0].getTime().getTime() < gameIn.getUsers()[1].getTime().getTime()) {
+								gameIn.setWinner(gameIn.getUsers()[0]);
+							} else if (gameIn.getUsers()[0].getTime().getTime() > gameIn.getUsers()[1].getTime().getTime()) {
+								gameIn.setWinner(gameIn.getUsers()[1]);
+							} else {
+								User winUser = ((int) Math.random() * 1 == 0) ? gameIn.getUsers()[0]
+										: gameIn.getUsers()[1];
+								gameIn.setWinner(winUser);
+							}
+							msg = gson.toJson(gameIn);
+
+						} catch (TimeException e) {
+							e.printStackTrace();
+						}
 					}
 					sendDirectTwo(one, two, msg);
 				} else {
@@ -113,7 +127,6 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 					sendDirectOne(one, msg);
 				}
 				break;
-
 		}
 	}
 

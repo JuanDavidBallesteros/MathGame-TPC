@@ -32,7 +32,7 @@ public class GameController implements Receptor.OnMessageListener {
 
     @Override
     public void onMessage(String msg) {
-        // System.out.println(msg);
+
         Game game = gson.fromJson(msg, Game.class);
 
         if (game.isFull()) {
@@ -56,11 +56,14 @@ public class GameController implements Receptor.OnMessageListener {
     private void btnActions() {
         view.getValidateBtn().setOnAction(e -> {
             if (validateAnswer()) {
-                user.getProblems().poll();
-                    user.setNumProblem(user.getNumProblem() + 1);
+                user.getProblems().poll(); 
                 if (user.getProblems().isEmpty()) {
                     user.setFinish(true);
+                    user.getTime().stopTime();
+                } else {
+                    user.setNumProblem(user.getNumProblem() + 1);
                 }
+                
                 Game game = user.getGame();
                 String json = gson.toJson(game);
                 tcp.getEmisor().sendMessage(json);
@@ -86,6 +89,7 @@ public class GameController implements Receptor.OnMessageListener {
         if (user.getProblems().size() == 0 && !user.isFinish()) {
             Queue<Problem> temp = new LinkedList<>(game.getProblems());
             user.setProblems(temp);
+            user.getTime().startTime();
         }
     }
 

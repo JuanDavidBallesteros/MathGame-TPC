@@ -5,13 +5,13 @@ import java.util.Queue;
 
 public class User {
 	
-	
 	public String type = "User";
 	private String id;
 	private int numProblem;
 
 	private Queue<Problem> problems;
 	private boolean finish;
+	private CounterTime time;
 	
 	private transient Game game;
 	
@@ -19,6 +19,7 @@ public class User {
 		numProblem = 1;
 		problems = new LinkedList<>();
 		finish =  false;
+		time = new CounterTime();
 	}
 	
 	public User(String id) {
@@ -66,8 +67,14 @@ public class User {
 
 	public void setFinish(boolean finish) {
 		this.finish = finish;
-	}	
+	}
 
-	
+	public CounterTime getTime() {
+		return time;
+	}
+
+	public void setTime(CounterTime time) {
+		this.time = time;
+	}
 
 }
