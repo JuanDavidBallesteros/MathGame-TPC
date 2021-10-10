@@ -36,33 +36,61 @@ public class GameController implements Receptor.OnMessageListener {
     }
 
     private void btnActions() {
-
         view.getValidateBtn().setOnAction(e -> {
-            System.out.println("Hola");
+            if (validateAnswer()) {
+                user.getProblems().poll();
+                user.setNumProblem(user.getNumProblem() + 1);
+
+                if (user.getProblems().size() <= 0) {
+                    user.setFinish(true);
+                }
+                Game game = user.getGame();
+                String json = gson.toJson(game);
+                tcp.getEmisor().sendMessage(json);
+
+            } else {
+                // Alerta valor invalido cierre automatico
+                System.out.println("Revisa tu respuesta");
+            }
         });
+    }
+
+    private boolean validateAnswer() {
+        int answer = Integer.parseInt(view.getAnswerTF().getText());
+        int result = user.getProblems().peek().getResult();
+        if (answer == result) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public void onMessage(String msg) {
-
+        // System.out.println(msg);
         Game game = gson.fromJson(msg, Game.class);
-        user.setGame(game);
 
         if (game.isFull()) {
-            if (user.getProblems().size() == 0) {
-                user.setProblems(game.getProblems());
-            }
-
             opponent = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[1] : game.getUsers()[0];
+            user = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[0] : game.getUsers()[1];
+            user.setGame(game);
+            giveProblems(game);
 
-            if (game.getWinner() == null) {
+            if (user.isFinish() && game.getWinner() == null) {
+                gameWindowInWaiting();
+            } else if (game.getWinner() == null && !user.isFinish()) {
                 gameWindowInGame();
-
             } else {
                 gameWindowWinner(game);
             }
         } else {
             gameWindowNoFull();
+        }
+    }
+
+    private void giveProblems(Game game) {
+        if (user.getProblems().size() == 0 && !user.isFinish()) {
+            user.setProblems(game.getProblems());
         }
     }
 
@@ -74,13 +102,15 @@ public class GameController implements Receptor.OnMessageListener {
     }
 
     private void gameWindowWinner(Game game) {
+
         view.getValidateBtn().setDisable(true);
+
         if (game.getWinner().getId().equals(user.getId())) {
 
             view.setLabelText(view.getOppStatus(), "Loser");
             view.setLabelText(view.getProblemLabel(), "You Win!");
             view.setLabelText(view.getOwnStatus(), "Winner");
-            
+
         } else {
             view.setLabelText(view.getOppStatus(), "Winner");
             view.setLabelText(view.getProblemLabel(), "You Lose :(");
@@ -95,7 +125,13 @@ public class GameController implements Receptor.OnMessageListener {
         view.setLabelText(view.getOppStatus(), opponent.getStatus());
         view.setLabelText(view.getProblemLabel(), user.getProblems().peek().getText());
         view.setLabelText(view.getOwnStatus(), user.getStatus());
+    }
 
+    private void gameWindowInWaiting() {
+        view.buttonDisable(view.getValidateBtn(), true);
+        view.setLabelText(view.getOppStatus(), opponent.getStatus());
+        view.setLabelText(view.getProblemLabel(), "Waiting opponent to finish");
+        view.setLabelText(view.getOwnStatus(), user.getStatus());
     }
 
     private void close() {

@@ -125,7 +125,7 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 			} else if (game.getUsers()[1] == null) {
 				game.getUsers()[1] = sessionQueue.peek().getUser();
 				sessionQueue.peek().getUser().setGame(game);
-
+				
 				String msg = gson.toJson(game);
 				sendDirectTwo(findSession(game.getUsers()[0]), sessionQueue.poll(), msg);
 			}

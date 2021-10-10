@@ -11,12 +11,14 @@ public class User {
 	private int numProblem;
 
 	private Queue<Problem> problems;
+	private boolean finish;
 	
 	private transient Game game;
 	
 	public User() {
 		numProblem = 1;
 		problems = new LinkedList<>();
+		finish =  false;
 	}
 	
 	public User(String id) {
@@ -56,6 +58,16 @@ public class User {
 
 	public void setProblems(Queue<Problem> problems) {
 		this.problems = problems;
+	}
+
+	public boolean isFinish() {
+		return finish;
+	}
+
+	public void setFinish(boolean finish) {
+		this.finish = finish;
 	}	
+
+	
 
 }
