@@ -96,9 +96,7 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 				sessionQueue.add(session);
 				matchPlayers();
 				break;
-			default:
 
-				break;
 			case "Game":
 				Game gameIn = gson.fromJson(msg, Game.class);
 				if (gameIn.isFull()) {
@@ -108,14 +106,17 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 						try {
 							if (gameIn.getUsers()[0].getTime().getTime() < gameIn.getUsers()[1].getTime().getTime()) {
 								gameIn.setWinner(gameIn.getUsers()[0]);
-							} else if (gameIn.getUsers()[0].getTime().getTime() > gameIn.getUsers()[1].getTime().getTime()) {
+							} else if (gameIn.getUsers()[0].getTime().getTime() > gameIn.getUsers()[1].getTime()
+									.getTime()) {
 								gameIn.setWinner(gameIn.getUsers()[1]);
 							} else {
 								User winUser = ((int) Math.random() * 1 == 0) ? gameIn.getUsers()[0]
 										: gameIn.getUsers()[1];
 								gameIn.setWinner(winUser);
 							}
+							
 							msg = gson.toJson(gameIn);
+							game = new Game();
 
 						} catch (TimeException e) {
 							e.printStackTrace();
@@ -126,6 +127,9 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 					Session one = findSession(gameIn.getUsers()[0]);
 					sendDirectOne(one, msg);
 				}
+				break;
+
+			default:
 				break;
 		}
 	}
@@ -145,11 +149,13 @@ public class TPCServer extends Thread implements Receptor.OnMessageListener {
 
 				String msg = gson.toJson(game);
 				sendDirectTwo(findSession(game.getUsers()[0]), sessionQueue.poll(), msg);
+			} else { // Reject user
+				String msg = gson.toJson(new Reject());
+				sendDirectOne(sessionQueue.poll(), msg);
 			}
-
-			if (game.isFull()) {
-				game = new Game();
-			}
+			/*
+			 * if (game.isFull()) { game = new Game(); }
+			 */
 		}
 	}
 

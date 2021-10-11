@@ -25,8 +25,11 @@ public class ConnectionController implements TCPConnection.OnConnectionListener 
         });
 
         view.getLocalBtn().setOnAction(e -> {
-            view.getIpTF().setText("127.0.0.1");
-            view.getPortTF().setText("5000");
+            Platform.runLater(() -> {
+                view.getIpTF().setText("127.0.0.1");
+                view.getPortTF().setText("5000");
+            });
+
         });
 
         view.getPlayBtn().setOnAction(e -> {
@@ -53,11 +56,11 @@ public class ConnectionController implements TCPConnection.OnConnectionListener 
                 gameView.show();
             });
         } else {
-            if(view.getWarmingLabel().isVisible()){
+            if (view.getWarmingLabel().isVisible()) {
                 view.setLabelText(view.getWarmingLabel(), view.getWarmingLabel().getText() + " Error to connect");
             } else {
                 view.warmingLabelVisible();
-            } 
+            }
         }
     }
 

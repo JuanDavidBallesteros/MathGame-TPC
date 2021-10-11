@@ -35,30 +35,45 @@ public class GameController implements Receptor.OnMessageListener {
 
     @Override
     public void onMessage(String msg) {
+        Generic obj = gson.fromJson(msg, Generic.class);
+        switch (obj.getType()) {
+            case "Game":
 
-        Game game = gson.fromJson(msg, Game.class);
+                Game game = gson.fromJson(msg, Game.class);
 
-        if (game.isFull()) {
-            opponent = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[1] : game.getUsers()[0];
-            user = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[0] : game.getUsers()[1];
-            user.setGame(game);
-            giveProblems(game);
+                if (game.isFull()) {
+                    opponent = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[1]
+                            : game.getUsers()[0];
+                    user = (game.getUsers()[0].getId().equals(user.getId())) ? game.getUsers()[0] : game.getUsers()[1];
+                    user.setGame(game);
+                    giveProblems(game);
 
-            if (user.isFinish() && game.getWinner() == null && !opponent.isFinish()) {
-                gameWindowInWaiting();
-            } else if (game.getWinner() == null && !user.isFinish()) {
-                gameWindowInGame();
-            } else {
-                gameWindowWinner(game);
-            }
-        } else {
-            gameWindowNoFull();
+                    if (user.isFinish() && game.getWinner() == null && !opponent.isFinish()) {
+                        gameWindowInWaiting();
+                    } else if (game.getWinner() == null && !user.isFinish()) {
+                        gameWindowInGame();
+                    } else {
+                        gameWindowWinner(game);
+                    }
+                } else {
+                    gameWindowNoFull();
+                }
+
+                break;
+
+            case "Reject":
+                gameWindowReject();
+                close();
+                break;
+
+            default:
+                break;
         }
     }
 
     private void btnActions() {
         view.getValidateBtn().setOnAction(e -> {
-            
+
             view.cleanAnswer();
 
             if (validateAnswer()) {
@@ -141,6 +156,13 @@ public class GameController implements Receptor.OnMessageListener {
         view.setLabelText(view.getOppStatus(), opponent.getStatus());
         view.setLabelText(view.getProblemLabel(), "Waiting opponent to finish");
         view.setLabelText(view.getOwnStatus(), user.getStatus());
+    }
+
+    private void gameWindowReject() {
+        view.buttonDisable(view.getValidateBtn(), true);
+        view.setLabelText(view.getOppStatus(), "...");
+        view.setLabelText(view.getProblemLabel(), "Game Busy, try latter");
+        view.setLabelText(view.getOwnStatus(), "...");
     }
 
     private void close() {
